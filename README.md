@@ -4,14 +4,14 @@ Ein vollständiges Nutzerverwaltungssystem mit FastAPI (Backend) und SvelteKit (
 
 ## Features
 
-- ✅ Benutzerregistrierung mit Validierung
-- ✅ Login/Logout mit Session-Management und JWT-Tokens
-- ✅ Profilansicht und -bearbeitung
-- ✅ Admin-Panel mit Nutzerverwaltung
-- ✅ Passwort zurücksetzen via E-Mail (Resend)
-- ✅ Two-Factor-Authentifizierung (TOTP)
-- ✅ Email-Test-Tool für Admins
-- ✅ Zwei Benutzerrollen: Admin und User
+- Benutzerregistrierung mit Validierung
+- Login/Logout mit Session-Management und JWT-Tokens
+- Profilansicht und -bearbeitung
+- Admin-Panel mit Nutzerverwaltung
+- Passwort zurücksetzen via E-Mail (Resend)
+- Two-Factor-Authentifizierung (TOTP)
+- Email-Test-Tool für Admins
+- Zwei Benutzerrollen: Admin und User
 
 ## Tech Stack
 
