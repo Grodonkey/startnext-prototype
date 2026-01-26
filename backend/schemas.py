@@ -40,6 +40,7 @@ class LoginRequest(BaseModel):
 
 class LoginResponse(BaseModel):
     access_token: str
+    session_token: str
     token_type: str = "bearer"
     user: UserResponse
 
@@ -87,6 +88,16 @@ class TestEmailRequest(BaseModel):
     email: EmailStr
     email_type: str = Field(..., description="Type: welcome, password_reset, account_activated, account_deactivated, test_simple")
     user_name: Optional[str] = None
+
+
+# Token refresh schemas
+class RefreshTokenRequest(BaseModel):
+    session_token: str
+
+
+class RefreshTokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
 
 
 # Generic response

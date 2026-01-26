@@ -11,7 +11,8 @@ from security import (
     create_access_token,
     create_session_token,
     create_reset_token,
-    get_current_user
+    get_current_user,
+    validate_session
 )
 from two_factor import verify_2fa_code
 from email_service import send_password_reset_email, send_welcome_email, send_magic_link_email
@@ -130,7 +131,7 @@ def login(
     session = models.Session(
         user_id=user.id,
         session_token=session_token,
-        expires_at=datetime.utcnow() + timedelta(days=7),
+        expires_at=datetime.utcnow() + timedelta(hours=settings.SESSION_TOKEN_EXPIRE_HOURS),
         ip_address=request.client.host if request.client else None,
         user_agent=request.headers.get("user-agent")
     )
@@ -139,8 +140,36 @@ def login(
 
     return {
         "access_token": access_token,
+        "session_token": session_token,
         "token_type": "bearer",
         "user": user
+    }
+
+
+@router.post("/refresh", response_model=schemas.RefreshTokenResponse)
+def refresh_token(
+    refresh_data: schemas.RefreshTokenRequest,
+    db: Session = Depends(get_db)
+):
+    """Refresh the access token using a valid session token"""
+    user = validate_session(db, refresh_data.session_token)
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired session"
+        )
+
+    # Create new access token
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": str(user.id)},
+        expires_delta=access_token_expires
+    )
+
+    return {
+        "access_token": access_token,
+        "token_type": "bearer"
     }
 
 
@@ -263,7 +292,7 @@ def verify_magic_link(
     session = models.Session(
         user_id=user.id,
         session_token=session_token,
-        expires_at=datetime.utcnow() + timedelta(days=7),
+        expires_at=datetime.utcnow() + timedelta(hours=settings.SESSION_TOKEN_EXPIRE_HOURS),
         ip_address=request.client.host if request.client else None,
         user_agent=request.headers.get("user-agent")
     )
@@ -272,6 +301,7 @@ def verify_magic_link(
 
     return {
         "access_token": access_token,
+        "session_token": session_token,
         "token_type": "bearer",
         "user": user
     }

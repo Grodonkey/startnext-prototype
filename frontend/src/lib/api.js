@@ -2,6 +2,34 @@ import { auth } from './stores/auth';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
+let isRefreshing = false;
+let refreshPromise = null;
+
+async function refreshAccessToken() {
+	const sessionToken = localStorage.getItem('session_token');
+	if (!sessionToken) {
+		return null;
+	}
+
+	try {
+		const response = await fetch(`${API_URL}/api/auth/refresh`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ session_token: sessionToken })
+		});
+
+		if (!response.ok) {
+			return null;
+		}
+
+		const data = await response.json();
+		localStorage.setItem('token', data.access_token);
+		return data.access_token;
+	} catch {
+		return null;
+	}
+}
+
 export async function apiRequest(endpoint, options = {}) {
 	const token = localStorage.getItem('token');
 
@@ -14,13 +42,40 @@ export async function apiRequest(endpoint, options = {}) {
 		headers['Authorization'] = `Bearer ${token}`;
 	}
 
-	const response = await fetch(`${API_URL}${endpoint}`, {
+	let response = await fetch(`${API_URL}${endpoint}`, {
 		...options,
 		headers
 	});
 
+	// If unauthorized, try to refresh the token
+	if (response.status === 401 && !options._isRetry) {
+		// Prevent multiple simultaneous refresh attempts
+		if (!isRefreshing) {
+			isRefreshing = true;
+			refreshPromise = refreshAccessToken();
+		}
+
+		const newToken = await refreshPromise;
+		isRefreshing = false;
+		refreshPromise = null;
+
+		if (newToken) {
+			// Retry the original request with new token
+			headers['Authorization'] = `Bearer ${newToken}`;
+			response = await fetch(`${API_URL}${endpoint}`, {
+				...options,
+				headers,
+				_isRetry: true
+			});
+		} else {
+			// Refresh failed, clear auth state
+			auth.clear();
+			const error = await response.json().catch(() => ({ detail: 'Session expired' }));
+			throw new Error(error.detail || 'Session expired');
+		}
+	}
+
 	if (!response.ok) {
-		// If unauthorized, clear auth state
 		if (response.status === 401) {
 			auth.clear();
 		}
@@ -59,6 +114,9 @@ export async function login(email, password, twoFactorCode = null) {
 
 	if (response.access_token) {
 		auth.setUser(response.user, response.access_token);
+		if (response.session_token) {
+			localStorage.setItem('session_token', response.session_token);
+		}
 	}
 
 	return response;
@@ -69,6 +127,7 @@ export async function logout() {
 		await apiRequest('/api/auth/logout', { method: 'POST' });
 	} finally {
 		auth.clear();
+		localStorage.removeItem('session_token');
 	}
 }
 
@@ -116,6 +175,9 @@ export async function verifyMagicLink(token) {
 
 	if (response.access_token) {
 		auth.setUser(response.user, response.access_token);
+		if (response.session_token) {
+			localStorage.setItem('session_token', response.session_token);
+		}
 	}
 
 	return response;

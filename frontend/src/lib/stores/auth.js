@@ -46,6 +46,7 @@ function createAuthStore() {
 		if (browser) {
 			localStorage.removeItem('token');
 			localStorage.removeItem('user');
+			localStorage.removeItem('session_token');
 		}
 		set({
 			isAuthenticated: false,
