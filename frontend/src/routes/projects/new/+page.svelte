@@ -161,6 +161,7 @@
 	function handlePlanContinue(event) {
 		pricing.setPlan(event.detail.plan);
 		step = 'form';
+		window.scrollTo({ top: 0, behavior: 'smooth' });
 	}
 
 	function handleFundingChange(event) {
@@ -190,11 +191,13 @@
 	// Continue to form step (no auth required here)
 	function handleContinueToForm() {
 		step = 'form';
+		window.scrollTo({ top: 0, behavior: 'smooth' });
 	}
 
 	// Back to selection step
 	function handleBackToSelection() {
 		step = 'selection';
+		window.scrollTo({ top: 0, behavior: 'smooth' });
 	}
 
 	// Form handlers

@@ -328,7 +328,27 @@ export const translations = {
 		'pricing.backButton': 'Zurück',
 		'pricing.changePlan': 'Plan ändern',
 		'pricing.selectedPlan': 'Ausgewählter Plan',
-		'pricing.selectPlanFirst': 'Wähle zuerst einen Plan für dein Projekt'
+		'pricing.selectPlanFirst': 'Wähle zuerst einen Plan für dein Projekt',
+
+		// Footer
+		'footer.tagline': 'Die Crowdfunding-Plattform für kreative Projekte und innovative Ideen.',
+		'footer.platform': 'Plattform',
+		'footer.support': 'Hilfe',
+		'footer.legal': 'Rechtliches',
+		'footer.faq': 'FAQ',
+		'footer.contact': 'Kontakt',
+		'footer.help': 'Hilfe-Center',
+		'footer.imprint': 'Impressum',
+		'footer.privacy': 'Datenschutz',
+		'footer.terms': 'AGB',
+		'footer.rights': 'Alle Rechte vorbehalten.',
+		'footer.madeWith': 'Mit',
+		'footer.location': 'in Dresden',
+		'footer.stats.funded': 'von der Crowd finanziert',
+		'footer.stats.projects': 'Erfolgreiche Projekte',
+		'footer.stats.users': 'Nutzer:innen',
+		'footer.fundingNotice': 'Das Projekt "SONAR" (Crowd Powered Growth Programme) wird im Rahmen des Programms "Nachhaltig wirken - Förderung gemeinwohlorientierter Unternehmen" durch das Bundesministerium für Wirtschaft und Energie und die Europäische Union über den Europäischen Sozialfonds Plus (ESF Plus) gefördert.',
+		'footer.fundingNoticeLink': 'Weitere Details auf unserer SONAR Landingpage.'
 	},
 
 	en: {
@@ -647,6 +667,26 @@ export const translations = {
 		'pricing.backButton': 'Back',
 		'pricing.changePlan': 'Change plan',
 		'pricing.selectedPlan': 'Selected plan',
-		'pricing.selectPlanFirst': 'Select a plan for your project first'
+		'pricing.selectPlanFirst': 'Select a plan for your project first',
+
+		// Footer
+		'footer.tagline': 'The crowdfunding platform for creative projects and innovative ideas.',
+		'footer.platform': 'Platform',
+		'footer.support': 'Support',
+		'footer.legal': 'Legal',
+		'footer.faq': 'FAQ',
+		'footer.contact': 'Contact',
+		'footer.help': 'Help Center',
+		'footer.imprint': 'Imprint',
+		'footer.privacy': 'Privacy Policy',
+		'footer.terms': 'Terms of Service',
+		'footer.rights': 'All rights reserved.',
+		'footer.madeWith': 'Made with',
+		'footer.location': 'in Dresden',
+		'footer.stats.funded': 'funded by the crowd',
+		'footer.stats.projects': 'Successful projects',
+		'footer.stats.users': 'Users',
+		'footer.fundingNotice': 'The project "SONAR" (Crowd Powered Growth Programme) is funded under the program "Making a sustainable impact - Support for community-oriented enterprises" by the Federal Ministry for Economic Affairs and Energy and the European Union through the European Social Fund Plus (ESF Plus).',
+		'footer.fundingNoticeLink': 'More details on our SONAR landing page.'
 	}
 };
