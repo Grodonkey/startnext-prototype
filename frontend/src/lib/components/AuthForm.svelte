@@ -303,7 +303,7 @@
 					<button
 						type="button"
 						on:click={() => switchMode('magic')}
-						class="text-[#304b50] dark:text-[#06E481] hover:underline"
+						class="text-[#06E481] hover:underline font-medium"
 					>
 						{$t('nav.login')}
 					</button>
@@ -314,7 +314,7 @@
 					<button
 						type="button"
 						on:click={() => switchMode('register')}
-						class="text-[#304b50] dark:text-[#06E481] hover:underline"
+						class="text-[#06E481] hover:underline font-medium"
 					>
 						{$t('nav.register')}
 					</button>
