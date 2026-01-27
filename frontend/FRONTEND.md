@@ -101,7 +101,48 @@ npm run build
 
 # Production Preview
 npm run preview
+
+# Tests ausführen (watch mode)
+npm run test
+
+# Tests einmalig ausführen
+npm run test:run
 ```
+
+## Testing
+
+Das Frontend verwendet Vitest mit @testing-library/svelte für Unit- und Integrationstests.
+
+### Test-Struktur
+
+```
+src/tests/
+├── setup.js           # Test-Setup und Mocks
+├── api.test.js        # API-Utility-Tests
+└── stores.test.js     # Store-Tests
+```
+
+### Tests schreiben
+
+```javascript
+import { describe, it, expect } from 'vitest';
+import { render, screen } from '@testing-library/svelte';
+import MyComponent from '$lib/components/MyComponent.svelte';
+
+describe('MyComponent', () => {
+  it('renders correctly', () => {
+    render(MyComponent, { props: { title: 'Test' } });
+    expect(screen.getByText('Test')).toBeInTheDocument();
+  });
+});
+```
+
+### SvelteKit Mocks
+
+Die Setup-Datei enthält Mocks für:
+- `$app/environment`
+- `$app/navigation`
+- `$app/stores`
 
 ## Routing (File-based)
 
