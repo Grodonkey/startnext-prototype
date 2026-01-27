@@ -64,3 +64,16 @@ backend/session_data/
 
 # Uploads (stored on Railway Volume in production)
 backend/uploads/
+
+# Capacitor iOS
+frontend/ios/App/Pods/
+frontend/ios/App/App.xcworkspace/xcuserdata/
+frontend/ios/App/App.xcodeproj/xcuserdata/
+frontend/ios/DerivedData/
+*.xcuserstate
+
+# Capacitor Android (falls später hinzugefügt)
+frontend/android/.gradle/
+frontend/android/app/build/
+frontend/android/build/
+frontend/android/local.properties
