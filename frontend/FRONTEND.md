@@ -28,7 +28,7 @@ cp .env.example .env
 Bearbeite `.env`:
 
 ```env
-PUBLIC_API_URL=http://localhost:8000
+VITE_API_URL=http://localhost:8000
 ```
 
 ## Frontend starten

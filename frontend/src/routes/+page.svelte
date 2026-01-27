@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { t } from '$lib/stores/language';
 	import { listFeaturedProjects, listNearGoalProjects, getSuccessfulStarters } from '$lib/api';
-	import { formatCurrency, calculateProgress } from '$lib/utils';
+	import { formatCurrency, calculateProgress, getImageUrl, getAvatarUrl } from '$lib/utils';
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 	import Alert from '$lib/components/Alert.svelte';
 	import Badge from '$lib/components/Badge.svelte';
@@ -76,7 +76,7 @@
 								<div class="relative aspect-[16/9]">
 									{#if featuredProjects[0].image_url}
 										<img
-											src={featuredProjects[0].image_url}
+											src={getImageUrl(featuredProjects[0].image_url)}
 											alt={featuredProjects[0].title}
 											class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
 										/>
@@ -131,7 +131,7 @@
 									<div class="w-1/3 flex-shrink-0">
 										{#if project.image_url}
 											<img
-												src={project.image_url}
+												src={getImageUrl(project.image_url)}
 												alt={project.title}
 												class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
 											/>
@@ -272,7 +272,7 @@
 								<div class="relative aspect-video">
 									{#if project.image_url}
 										<img
-											src={project.image_url}
+											src={getImageUrl(project.image_url)}
 											alt={project.title}
 											class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
 										/>

@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { t } from '$lib/stores/language';
 	import { listProjects } from '$lib/api';
-	import { formatCurrency, calculateProgress } from '$lib/utils';
+	import { formatCurrency, calculateProgress, getImageUrl } from '$lib/utils';
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 	import Alert from '$lib/components/Alert.svelte';
 	import EmptyState from '$lib/components/EmptyState.svelte';
@@ -56,7 +56,7 @@
 				>
 					{#if project.image_url}
 						<img
-							src={project.image_url}
+							src={getImageUrl(project.image_url)}
 							alt={project.title}
 							class="w-full h-48 object-cover"
 						/>

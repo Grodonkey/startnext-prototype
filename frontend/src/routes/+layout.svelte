@@ -5,6 +5,8 @@
 	import { theme } from '$lib/stores/theme';
 	import { language, t } from '$lib/stores/language';
 	import { initStoryblok } from '$lib/storyblok';
+	import Avatar from '$lib/components/Avatar.svelte';
+	import { getAvatarUrl } from '$lib/utils';
 
 	// Initialize Storyblok
 	initStoryblok();
@@ -116,11 +118,13 @@
 					<div class="h-6 w-px bg-gray-300 dark:bg-gray-600"></div>
 
 					{#if $auth.isAuthenticated}
-						<a
-							href="/profile"
-							class="text-gray-700 dark:text-gray-300 hover:text-[#263c40] dark:hover:text-[#33f79f]"
-							>{$t('nav.profile')}</a
-						>
+						<a href="/profile" class="flex items-center">
+							<Avatar
+								name={$auth.user?.full_name || ''}
+								imageUrl={getAvatarUrl($auth.user?.avatar_url)}
+								size="sm"
+							/>
+						</a>
 					{:else}
 						<a
 							href="/login"
@@ -182,6 +186,38 @@
 
 		<!-- Menu Content -->
 		<div class="p-4 space-y-6 overflow-y-auto h-[calc(100%-64px)]">
+			<!-- Profile/Auth Section (at top) -->
+			<div class="pb-4 border-b border-gray-200 dark:border-gray-700">
+				{#if $auth.isAuthenticated}
+					<a
+						href="/profile"
+						on:click={closeMobileMenu}
+						class="flex items-center gap-4 px-3 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+					>
+						<Avatar
+							name={$auth.user?.full_name || ''}
+							imageUrl={getAvatarUrl($auth.user?.avatar_url)}
+							size="lg"
+						/>
+						<div>
+							<p class="font-semibold text-[#304b50] dark:text-white">{$auth.user?.full_name || $t('nav.profile')}</p>
+							<p class="text-sm text-gray-500 dark:text-gray-400">{$auth.user?.email}</p>
+						</div>
+					</a>
+				{:else}
+					<a
+						href="/login"
+						on:click={closeMobileMenu}
+						class="flex items-center gap-3 px-3 py-3 bg-[#06E481] text-[#304b50] font-semibold rounded-lg hover:bg-[#05b667] transition-colors"
+					>
+						<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+						</svg>
+						{$t('nav.login')}
+					</a>
+				{/if}
+			</div>
+
 			<!-- Main Navigation Links -->
 			<nav class="space-y-1">
 				<a
@@ -223,33 +259,6 @@
 					{$t('nav.community')}
 				</a>
 			</nav>
-
-			<div class="border-t border-gray-200 dark:border-gray-700 pt-4">
-				<!-- Auth Link -->
-				{#if $auth.isAuthenticated}
-					<a
-						href="/profile"
-						on:click={closeMobileMenu}
-						class="flex items-center gap-3 px-3 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-[#06E481] rounded-lg transition-colors font-medium"
-					>
-						<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-						</svg>
-						{$t('nav.profile')}
-					</a>
-				{:else}
-					<a
-						href="/login"
-						on:click={closeMobileMenu}
-						class="flex items-center gap-3 px-3 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-[#06E481] rounded-lg transition-colors font-medium"
-					>
-						<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-						</svg>
-						{$t('nav.login')}
-					</a>
-				{/if}
-			</div>
 
 			<!-- Settings -->
 			<div class="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-1">

@@ -1,9 +1,11 @@
 import os
+from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from database import engine, SessionLocal
 import models
-from routers import auth, users, admin, two_factor, projects, profiles, ai_coach
+from routers import auth, users, admin, two_factor, projects, profiles, ai_coach, uploads
 from security import get_password_hash
 from config import settings
 
@@ -38,6 +40,12 @@ app.include_router(two_factor.router)
 app.include_router(projects.router)
 app.include_router(profiles.router)
 app.include_router(ai_coach.router)
+app.include_router(uploads.router)
+
+# Configure static file serving for uploads
+UPLOAD_DIR = Path(os.environ.get("UPLOAD_DIR", "./uploads"))
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
 
 
 @app.on_event("startup")

@@ -25,6 +25,7 @@ class UserResponse(UserBase):
     is_admin: bool
     is_starter: bool = False
     two_factor_enabled: bool
+    avatar_url: Optional[str] = None
     created_at: datetime
 
     class Config:
@@ -145,6 +146,7 @@ class ProjectOwner(BaseModel):
     full_name: Optional[str] = None
     email: EmailStr
     profile_slug: str
+    avatar_url: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -251,6 +253,7 @@ class PublicProfileResponse(BaseModel):
     profile_slug: str
     full_name: str
     is_starter: bool = False
+    avatar_url: Optional[str] = None
     created_at: datetime
     projects: list[PublicProjectResponse] = []
 
@@ -262,6 +265,7 @@ class SuccessfulStarterResponse(BaseModel):
     id: int
     profile_slug: str
     full_name: str
+    avatar_url: Optional[str] = None
     created_at: datetime
     successful_projects_count: int = 0
     total_funding_raised: float = 0
@@ -274,6 +278,7 @@ class StarterResponse(BaseModel):
     id: int
     profile_slug: str
     full_name: str
+    avatar_url: Optional[str] = None
     created_at: datetime
     project_count: int = 0
     total_funding_raised: float = 0

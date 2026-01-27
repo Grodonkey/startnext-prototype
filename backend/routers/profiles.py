@@ -21,6 +21,7 @@ def get_all_starters(
         models.User.id,
         models.User.profile_slug,
         models.User.full_name,
+        models.User.avatar_url,
         models.User.created_at,
         func.count(models.Project.id).label("project_count"),
         func.coalesce(func.sum(models.Project.funding_current), 0).label("total_funding_raised")
@@ -39,6 +40,7 @@ def get_all_starters(
             "id": starter.id,
             "profile_slug": starter.profile_slug,
             "full_name": starter.full_name,
+            "avatar_url": starter.avatar_url,
             "created_at": starter.created_at,
             "project_count": starter.project_count,
             "total_funding_raised": float(starter.total_funding_raised or 0)
@@ -58,6 +60,7 @@ def get_successful_starters(
         models.User.id,
         models.User.profile_slug,
         models.User.full_name,
+        models.User.avatar_url,
         models.User.created_at,
         func.count(models.Project.id).label("successful_projects_count"),
         func.coalesce(func.sum(models.Project.funding_current), 0).label("total_funding_raised")
@@ -76,6 +79,7 @@ def get_successful_starters(
             "id": starter.id,
             "profile_slug": starter.profile_slug,
             "full_name": starter.full_name,
+            "avatar_url": starter.avatar_url,
             "created_at": starter.created_at,
             "successful_projects_count": starter.successful_projects_count,
             "total_funding_raised": float(starter.total_funding_raised or 0)
@@ -108,6 +112,7 @@ def get_public_profile(
         "id": user.id,
         "profile_slug": user.profile_slug,
         "full_name": user.full_name,
+        "avatar_url": user.avatar_url,
         "is_starter": user.is_starter,
         "created_at": user.created_at,
         "projects": public_projects

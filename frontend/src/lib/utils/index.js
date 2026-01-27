@@ -21,3 +21,9 @@ export {
 	getProjectTypeAccentColor,
 	getSortIcon
 } from './styling.js';
+
+// URL utilities
+export {
+	getImageUrl,
+	getAvatarUrl
+} from './urls.js';

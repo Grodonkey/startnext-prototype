@@ -61,3 +61,6 @@ htmlcov/
 
 # Session data
 backend/session_data/
+
+# Uploads (stored on Railway Volume in production)
+backend/uploads/

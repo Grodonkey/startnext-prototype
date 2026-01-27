@@ -55,6 +55,12 @@ function createAuthStore() {
 		});
 	}
 
+	function getUser() {
+		if (!browser) return null;
+		const userStr = localStorage.getItem('user');
+		return userStr ? JSON.parse(userStr) : null;
+	}
+
 	// Check auth status periodically (for token expiry)
 	if (browser) {
 		checkAuth();
@@ -65,7 +71,8 @@ function createAuthStore() {
 		subscribe,
 		checkAuth,
 		setUser,
-		clear
+		clear,
+		getUser
 	};
 }
 

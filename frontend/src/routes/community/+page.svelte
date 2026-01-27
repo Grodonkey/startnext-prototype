@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { t } from '$lib/stores/language';
 	import { getAllStarters } from '$lib/api';
-	import { formatCurrency, formatProjectCount } from '$lib/utils';
+	import { formatCurrency, formatProjectCount, getAvatarUrl } from '$lib/utils';
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 	import Alert from '$lib/components/Alert.svelte';
 	import EmptyState from '$lib/components/EmptyState.svelte';
@@ -48,7 +48,7 @@
 					<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
 						<div class="flex items-center mb-4">
 							<div class="flex-shrink-0 group-hover:scale-110 transition-transform">
-								<Avatar name={starter.full_name} size="lg" />
+								<Avatar name={starter.full_name} imageUrl={getAvatarUrl(starter.avatar_url)} size="lg" />
 							</div>
 							<div class="ml-4">
 								<h3 class="font-semibold text-[#304b50] dark:text-white group-hover:text-[#06E481] transition-colors">

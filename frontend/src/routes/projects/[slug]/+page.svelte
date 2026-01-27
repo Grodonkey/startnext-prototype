@@ -3,8 +3,8 @@
 	import { goto } from '$app/navigation';
 	import { t } from '$lib/stores/language';
 	import { auth } from '$lib/stores/auth';
-	import { getProject, updateProject, deleteProject, submitProject, duplicateProject } from '$lib/api';
-	import { formatCurrency, calculateProgress, formatDate, getStatusColor, getProjectTypeColor } from '$lib/utils';
+	import { getProject, updateProject, deleteProject, submitProject, duplicateProject, uploadProjectImage, deleteProjectImage } from '$lib/api';
+	import { formatCurrency, calculateProgress, formatDate, getStatusColor, getProjectTypeColor, getImageUrl } from '$lib/utils';
 
 	let project = null;
 	let loading = true;
@@ -25,6 +25,63 @@
 
 	// Edit values for each field
 	let editValues = {};
+
+	// Image upload state
+	let imageUploading = false;
+	let imageInput;
+
+	async function handleImageUpload(event) {
+		const file = event.target.files?.[0];
+		if (!file) return;
+
+		// Validate file type
+		if (!file.type.startsWith('image/')) {
+			error = 'Please select an image file';
+			return;
+		}
+
+		// Validate file size (max 5MB)
+		if (file.size > 5 * 1024 * 1024) {
+			error = 'Image must be smaller than 5MB';
+			return;
+		}
+
+		imageUploading = true;
+		error = null;
+
+		try {
+			const result = await uploadProjectImage(project.id, file);
+			project.image_url = result.image_url;
+			editingField = null;
+			success = $t('project.updated');
+			setTimeout(() => { success = null; }, 3000);
+		} catch (err) {
+			error = err.message;
+		} finally {
+			imageUploading = false;
+			// Reset input so same file can be selected again
+			if (imageInput) imageInput.value = '';
+		}
+	}
+
+	async function handleDeleteImage() {
+		if (!project.image_url) return;
+
+		imageUploading = true;
+		error = null;
+
+		try {
+			await deleteProjectImage(project.id);
+			project.image_url = null;
+			editingField = null;
+			success = $t('project.updated');
+			setTimeout(() => { success = null; }, 3000);
+		} catch (err) {
+			error = err.message;
+		} finally {
+			imageUploading = false;
+		}
+	}
 
 	$: slug = $page.params.slug;
 	$: isOwner = $auth.user && project && $auth.user.id === project.owner_id;
@@ -254,30 +311,86 @@
 			<!-- Project Image -->
 			{#if editMode && editingField === 'image_url'}
 				<div class="p-4 bg-gray-50 dark:bg-gray-700/50">
-					<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-						{$t('project.imageUrl')}
-					</label>
-					<input
-						type="url"
-						bind:value={editValues.image_url}
-						on:keydown={(e) => handleKeydown(e, 'image_url')}
-						class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-[#06E481] focus:border-[#06E481] dark:bg-gray-700 dark:text-white"
-						placeholder="https://..."
-					/>
-					<div class="mt-2 flex gap-2">
-						<button
-							on:click={() => saveField('image_url')}
-							disabled={saving}
-							class="px-3 py-1 text-sm bg-[#06E481] text-[#304b50] font-semibold rounded hover:bg-[#05b667] disabled:opacity-50"
-						>
-							{saving ? $t('project.saving') : $t('common.save')}
-						</button>
-						<button
-							on:click={cancelFieldEdit}
-							class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300 dark:hover:bg-gray-500"
-						>
-							{$t('common.cancel')}
-						</button>
+					<!-- Current Image Preview -->
+					{#if project.image_url}
+						<div class="mb-4">
+							<img
+								src={getImageUrl(project.image_url)}
+								alt={project.title}
+								class="w-full h-48 object-cover rounded-lg"
+							/>
+						</div>
+					{/if}
+
+					<!-- Upload Button -->
+					<div class="mb-4">
+						<input
+							type="file"
+							accept="image/*"
+							bind:this={imageInput}
+							on:change={handleImageUpload}
+							class="hidden"
+							id="project-image-input"
+						/>
+						<div class="flex items-center gap-3">
+							<button
+								on:click={() => imageInput?.click()}
+								disabled={imageUploading}
+								class="px-4 py-2 bg-[#06E481] text-[#304b50] font-semibold rounded-md hover:bg-[#05b667] transition-colors disabled:opacity-50 flex items-center gap-2"
+							>
+								{#if imageUploading}
+									<svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+										<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+										<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+									</svg>
+								{:else}
+									<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+									</svg>
+								{/if}
+								{$t('project.uploadImage')}
+							</button>
+
+							{#if project.image_url}
+								<button
+									on:click={handleDeleteImage}
+									disabled={imageUploading}
+									class="px-4 py-2 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-md hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors disabled:opacity-50"
+								>
+									{$t('project.deleteImage')}
+								</button>
+							{/if}
+						</div>
+						<p class="mt-2 text-xs text-gray-500 dark:text-gray-400">{$t('project.imageHint')}</p>
+					</div>
+
+					<!-- Or use URL -->
+					<div class="border-t border-gray-200 dark:border-gray-600 pt-4">
+						<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+							{$t('project.orEnterUrl')}
+						</label>
+						<input
+							type="url"
+							bind:value={editValues.image_url}
+							on:keydown={(e) => handleKeydown(e, 'image_url')}
+							class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-[#06E481] focus:border-[#06E481] dark:bg-gray-700 dark:text-white"
+							placeholder="https://..."
+						/>
+						<div class="mt-2 flex gap-2">
+							<button
+								on:click={() => saveField('image_url')}
+								disabled={saving}
+								class="px-3 py-1 text-sm bg-[#06E481] text-[#304b50] font-semibold rounded hover:bg-[#05b667] disabled:opacity-50"
+							>
+								{saving ? $t('project.saving') : $t('common.save')}
+							</button>
+							<button
+								on:click={cancelFieldEdit}
+								class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300 dark:hover:bg-gray-500"
+							>
+								{$t('common.cancel')}
+							</button>
+						</div>
 					</div>
 				</div>
 			{:else}
@@ -289,7 +402,7 @@
 				>
 					{#if project.image_url}
 						<img
-							src={project.image_url}
+							src={getImageUrl(project.image_url)}
 							alt={project.title}
 							class="w-full h-64 object-cover"
 						/>

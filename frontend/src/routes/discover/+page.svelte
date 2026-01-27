@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { t } from '$lib/stores/language';
 	import { listFeaturedProjects } from '$lib/api';
-	import { getProjectTypeButtonClass } from '$lib/utils';
+	import { getProjectTypeButtonClass, getImageUrl, getAvatarUrl } from '$lib/utils';
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 	import Alert from '$lib/components/Alert.svelte';
 	import EmptyState from '$lib/components/EmptyState.svelte';
@@ -95,7 +95,7 @@
 						<!-- Background Image -->
 						{#if project.image_url}
 							<img
-								src={project.image_url}
+								src={getImageUrl(project.image_url)}
 								alt={project.title}
 								class="absolute inset-0 w-full h-full object-cover"
 							/>
@@ -132,7 +132,7 @@
 										class="inline-flex items-center text-gray-300 hover:text-[#06E481] transition-colors text-sm mb-4"
 									>
 										<div class="mr-2">
-											<Avatar name={project.owner.full_name} size="sm" />
+											<Avatar name={project.owner.full_name} imageUrl={getAvatarUrl(project.owner.avatar_url)} size="sm" />
 										</div>
 										{project.owner.full_name || project.owner.email}
 									</a>

@@ -32,6 +32,9 @@ class User(Base):
     # Project starter role
     is_starter = Column(Boolean, default=False)
 
+    # Avatar
+    avatar_url = Column(String(500), nullable=True)
+
     # Relationship to projects
     projects = relationship("Project", back_populates="owner")
 

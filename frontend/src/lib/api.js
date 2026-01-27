@@ -1,6 +1,6 @@
 import { auth } from './stores/auth';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 let isRefreshing = false;
 let refreshPromise = null;
@@ -399,4 +399,52 @@ export async function convertAIDraft(threadId) {
 	return apiRequest(`/api/ai-coach/drafts/${threadId}/convert`, {
 		method: 'POST'
 	});
+}
+
+// File upload functions
+async function uploadFile(endpoint, file) {
+	const token = localStorage.getItem('token');
+	const formData = new FormData();
+	formData.append('file', file);
+
+	const response = await fetch(`${API_URL}${endpoint}`, {
+		method: 'POST',
+		headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+		body: formData
+	});
+
+	if (!response.ok) {
+		const error = await response.json().catch(() => ({ detail: 'Upload failed' }));
+		throw new Error(error.detail || 'Upload failed');
+	}
+
+	return response.json();
+}
+
+export async function uploadAvatar(file) {
+	const result = await uploadFile('/api/uploads/avatar', file);
+	// Update auth store with new avatar
+	const user = auth.getUser();
+	if (user) {
+		auth.setUser({ ...user, avatar_url: result.avatar_url }, localStorage.getItem('token'));
+	}
+	return result;
+}
+
+export async function deleteAvatar() {
+	const result = await apiRequest('/api/uploads/avatar', { method: 'DELETE' });
+	// Update auth store to remove avatar
+	const user = auth.getUser();
+	if (user) {
+		auth.setUser({ ...user, avatar_url: null }, localStorage.getItem('token'));
+	}
+	return result;
+}
+
+export async function uploadProjectImage(projectId, file) {
+	return uploadFile(`/api/uploads/project/${projectId}/image`, file);
+}
+
+export async function deleteProjectImage(projectId) {
+	return apiRequest(`/api/uploads/project/${projectId}/image`, { method: 'DELETE' });
 }

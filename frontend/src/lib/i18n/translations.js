@@ -86,6 +86,10 @@ export const translations = {
 		'profile.manualCode': 'Oder gib diesen Code manuell ein:',
 		'profile.enterVerifyCode': 'Bestätigungs-Code eingeben',
 		'profile.enterDisableCode': 'Code eingeben zum Deaktivieren',
+		'profile.avatar': 'Profilbild',
+		'profile.uploadAvatar': 'Bild hochladen',
+		'profile.deleteAvatar': 'Bild entfernen',
+		'profile.avatarHint': 'JPG, PNG oder GIF. Maximal 5MB.',
 
 		// Admin
 		'admin.title': 'Admin-Bereich',
@@ -246,6 +250,10 @@ export const translations = {
 		'project.fundingGoalPlaceholder': 'z.B. 10000',
 		'project.imageUrl': 'Bild-URL',
 		'project.videoUrl': 'Video-URL',
+		'project.uploadImage': 'Bild hochladen',
+		'project.deleteImage': 'Bild entfernen',
+		'project.imageHint': 'JPG, PNG oder GIF. Maximal 5MB.',
+		'project.orEnterUrl': 'Oder URL eingeben',
 		'project.creating': 'Wird erstellt...',
 		'project.save': 'Speichern',
 		'project.saving': 'Wird gespeichert...',
@@ -493,6 +501,10 @@ export const translations = {
 		'profile.manualCode': 'Or enter this code manually:',
 		'profile.enterVerifyCode': 'Enter verification code',
 		'profile.enterDisableCode': 'Enter code to disable',
+		'profile.avatar': 'Profile Picture',
+		'profile.uploadAvatar': 'Upload Picture',
+		'profile.deleteAvatar': 'Remove Picture',
+		'profile.avatarHint': 'JPG, PNG or GIF. Max 5MB.',
 
 		// Admin
 		'admin.title': 'Admin Area',
@@ -650,6 +662,10 @@ export const translations = {
 		'project.fundingGoalPlaceholder': 'e.g. 10000',
 		'project.imageUrl': 'Image URL',
 		'project.videoUrl': 'Video URL',
+		'project.uploadImage': 'Upload Image',
+		'project.deleteImage': 'Remove Image',
+		'project.imageHint': 'JPG, PNG or GIF. Max 5MB.',
+		'project.orEnterUrl': 'Or enter URL',
 		'project.creating': 'Creating...',
 		'project.save': 'Save',
 		'project.saving': 'Saving...',

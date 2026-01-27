@@ -2,7 +2,8 @@
 	import { page } from '$app/stores';
 	import { t } from '$lib/stores/language';
 	import { getPublicProfile } from '$lib/api';
-	import { formatCurrency, calculateProgress, formatDate, getInitials, getStatusColor } from '$lib/utils';
+	import { formatCurrency, calculateProgress, formatDate, getStatusColor, getImageUrl, getAvatarUrl } from '$lib/utils';
+	import Avatar from '$lib/components/Avatar.svelte';
 
 	let profile = null;
 	let loading = true;
@@ -58,10 +59,8 @@
 		<div class="bg-white dark:bg-gray-800 shadow rounded-lg p-8 mb-8">
 			<div class="flex flex-col sm:flex-row items-center sm:items-start gap-6">
 				<!-- Avatar -->
-				<div class="w-24 h-24 rounded-full bg-gradient-to-br from-[#304b50] to-[#06E481] flex items-center justify-center flex-shrink-0">
-					<span class="text-3xl font-bold text-white">
-						{getInitials(profile.full_name)}
-					</span>
+				<div class="flex-shrink-0">
+					<Avatar name={profile.full_name} imageUrl={getAvatarUrl(profile.avatar_url)} size="xl" />
 				</div>
 
 				<!-- Info -->
@@ -106,7 +105,7 @@
 								<div class="relative aspect-video">
 									{#if project.image_url}
 										<img
-											src={project.image_url}
+											src={getImageUrl(project.image_url)}
 											alt={project.title}
 											class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
 										/>

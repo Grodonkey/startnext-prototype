@@ -1,12 +1,15 @@
 <script>
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { getCurrentUser, updateProfile, setup2FA, verify2FA, disable2FA, isAuthenticated, listMyProjects, logout } from '$lib/api';
+	import { getCurrentUser, updateProfile, setup2FA, verify2FA, disable2FA, isAuthenticated, listMyProjects, logout, uploadAvatar, deleteAvatar } from '$lib/api';
 	import { t } from '$lib/stores/language';
+	import { auth } from '$lib/stores/auth';
+	import { getAvatarUrl } from '$lib/utils';
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 	import Alert from '$lib/components/Alert.svelte';
 	import Badge from '$lib/components/Badge.svelte';
 	import EmptyState from '$lib/components/EmptyState.svelte';
+	import Avatar from '$lib/components/Avatar.svelte';
 
 	let user = null;
 	let loading = true;
@@ -25,8 +28,61 @@
 	let projects = [];
 	let projectsLoading = true;
 
+	// Avatar upload state
+	let avatarUploading = false;
+	let avatarInput;
+
 	// Tab state: 'overview' or 'settings'
 	let activeTab = 'overview';
+
+	async function handleAvatarUpload(event) {
+		const file = event.target.files?.[0];
+		if (!file) return;
+
+		// Validate file type
+		if (!file.type.startsWith('image/')) {
+			error = 'Please select an image file';
+			return;
+		}
+
+		// Validate file size (max 5MB)
+		if (file.size > 5 * 1024 * 1024) {
+			error = 'Image must be smaller than 5MB';
+			return;
+		}
+
+		avatarUploading = true;
+		error = '';
+
+		try {
+			const result = await uploadAvatar(file);
+			user.avatar_url = result.avatar_url;
+			success = $t('profile.saved');
+		} catch (err) {
+			error = err.message;
+		} finally {
+			avatarUploading = false;
+			// Reset input so same file can be selected again
+			if (avatarInput) avatarInput.value = '';
+		}
+	}
+
+	async function handleDeleteAvatar() {
+		if (!user.avatar_url) return;
+
+		avatarUploading = true;
+		error = '';
+
+		try {
+			await deleteAvatar();
+			user.avatar_url = null;
+			success = $t('profile.saved');
+		} catch (err) {
+			error = err.message;
+		} finally {
+			avatarUploading = false;
+		}
+	}
 
 	onMount(async () => {
 		if (!isAuthenticated()) {
@@ -165,44 +221,56 @@
 		{#if activeTab === 'overview'}
 			<!-- Account Info -->
 			<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
-				<h2 class="text-xl font-semibold text-[#304b50] dark:text-white mb-4">{$t('profile.accountInfo')}</h2>
-				<div class="space-y-3">
-					<div>
-						<span class="font-medium text-gray-700 dark:text-gray-300">{$t('profile.fullName')}:</span>
-						<span class="text-gray-600 dark:text-gray-400 ml-2">{user.full_name || '-'}</span>
+				<div class="flex justify-between items-start">
+					<div class="flex-1">
+						<h2 class="text-xl font-semibold text-[#304b50] dark:text-white mb-4">{$t('profile.accountInfo')}</h2>
+						<div class="space-y-3">
+							<div>
+								<span class="font-medium text-gray-700 dark:text-gray-300">{$t('profile.fullName')}:</span>
+								<span class="text-gray-600 dark:text-gray-400 ml-2">{user.full_name || '-'}</span>
+							</div>
+							<div>
+								<span class="font-medium text-gray-700 dark:text-gray-300">{$t('profile.email')}:</span>
+								<span class="text-gray-600 dark:text-gray-400 ml-2">{user.email}</span>
+							</div>
+							<div>
+								<span class="font-medium text-gray-700 dark:text-gray-300">{$t('profile.status')}:</span>
+								{#if user.is_active}
+									<span class="ml-2 inline-block bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-400 px-2 py-1 rounded text-sm"
+										>{$t('profile.active')}</span
+									>
+								{:else}
+									<span class="ml-2 inline-block bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-400 px-2 py-1 rounded text-sm"
+										>{$t('profile.inactive')}</span
+									>
+								{/if}
+							</div>
+							<div>
+								<span class="font-medium text-gray-700 dark:text-gray-300">{$t('profile.role')}:</span>
+								{#if user.is_admin}
+									<span class="ml-2 inline-block bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 px-2 py-1 rounded text-sm"
+										>{$t('profile.admin')}</span
+									>
+								{/if}
+								{#if user.is_starter || projects.length > 0}
+									<span class="ml-2 inline-block bg-[#06E481]/20 dark:bg-[#06E481]/20 text-[#304b50] dark:text-[#06E481] px-2 py-1 rounded text-sm"
+										>{$t('profile.starter')}</span
+									>
+								{:else if !user.is_admin}
+									<span class="ml-2 inline-block bg-gray-100 dark:bg-gray-700 text-[#304b50] dark:text-gray-300 px-2 py-1 rounded text-sm"
+										>{$t('profile.supporter')}</span
+									>
+								{/if}
+							</div>
+						</div>
 					</div>
-					<div>
-						<span class="font-medium text-gray-700 dark:text-gray-300">{$t('profile.email')}:</span>
-						<span class="text-gray-600 dark:text-gray-400 ml-2">{user.email}</span>
-					</div>
-					<div>
-						<span class="font-medium text-gray-700 dark:text-gray-300">{$t('profile.status')}:</span>
-						{#if user.is_active}
-							<span class="ml-2 inline-block bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-400 px-2 py-1 rounded text-sm"
-								>{$t('profile.active')}</span
-							>
-						{:else}
-							<span class="ml-2 inline-block bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-400 px-2 py-1 rounded text-sm"
-								>{$t('profile.inactive')}</span
-							>
-						{/if}
-					</div>
-					<div>
-						<span class="font-medium text-gray-700 dark:text-gray-300">{$t('profile.role')}:</span>
-						{#if user.is_admin}
-							<span class="ml-2 inline-block bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 px-2 py-1 rounded text-sm"
-								>{$t('profile.admin')}</span
-							>
-						{/if}
-						{#if user.is_starter || projects.length > 0}
-							<span class="ml-2 inline-block bg-[#06E481]/20 dark:bg-[#06E481]/20 text-[#304b50] dark:text-[#06E481] px-2 py-1 rounded text-sm"
-								>{$t('profile.starter')}</span
-							>
-						{:else if !user.is_admin}
-							<span class="ml-2 inline-block bg-gray-100 dark:bg-gray-700 text-[#304b50] dark:text-gray-300 px-2 py-1 rounded text-sm"
-								>{$t('profile.supporter')}</span
-							>
-						{/if}
+					<!-- Avatar on the right -->
+					<div class="flex-shrink-0 ml-6">
+						<Avatar
+							name={user.full_name || ''}
+							imageUrl={getAvatarUrl(user.avatar_url)}
+							size="xl"
+						/>
 					</div>
 				</div>
 
@@ -266,6 +334,58 @@
 
 		<!-- Settings Tab -->
 		{#if activeTab === 'settings'}
+			<!-- Avatar Upload -->
+			<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+				<h2 class="text-xl font-semibold text-[#304b50] dark:text-white mb-4">{$t('profile.avatar')}</h2>
+
+				<div class="flex items-center gap-6">
+					<Avatar
+						name={user.full_name || ''}
+						imageUrl={getAvatarUrl(user.avatar_url)}
+						size="xl"
+					/>
+
+					<div class="flex flex-col gap-3">
+						<input
+							type="file"
+							accept="image/*"
+							bind:this={avatarInput}
+							on:change={handleAvatarUpload}
+							class="hidden"
+							id="avatar-input"
+						/>
+						<button
+							on:click={() => avatarInput?.click()}
+							disabled={avatarUploading}
+							class="px-4 py-2 bg-[#06E481] text-[#304b50] font-semibold rounded-md hover:bg-[#05b667] transition-colors disabled:opacity-50 flex items-center gap-2"
+						>
+							{#if avatarUploading}
+								<svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+									<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+									<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+								</svg>
+							{:else}
+								<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+								</svg>
+							{/if}
+							{$t('profile.uploadAvatar')}
+						</button>
+
+						{#if user.avatar_url}
+							<button
+								on:click={handleDeleteAvatar}
+								disabled={avatarUploading}
+								class="px-4 py-2 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-md hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors disabled:opacity-50"
+							>
+								{$t('profile.deleteAvatar')}
+							</button>
+						{/if}
+					</div>
+				</div>
+				<p class="mt-3 text-sm text-gray-500 dark:text-gray-400">{$t('profile.avatarHint')}</p>
+			</div>
+
 			<!-- Edit Profile -->
 			<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
 				<h2 class="text-xl font-semibold text-[#304b50] dark:text-white mb-4">{$t('profile.editProfile')}</h2>
