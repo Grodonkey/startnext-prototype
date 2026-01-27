@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import engine, SessionLocal
@@ -5,11 +6,15 @@ import models
 from routers import auth, users, admin, two_factor, projects, profiles, ai_coach
 from security import get_password_hash
 from config import settings
-from migrations import run_migrations
 
-# Run Alembic migrations before starting the app
-if not run_migrations(engine):
-    # Fallback to create_all if migrations fail
+# Skip migrations in test mode - use create_all instead
+if os.environ.get("TESTING") != "true":
+    from migrations import run_migrations
+    if not run_migrations(engine):
+        # Fallback to create_all if migrations fail
+        models.Base.metadata.create_all(bind=engine)
+else:
+    # In test mode, just create all tables
     models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
