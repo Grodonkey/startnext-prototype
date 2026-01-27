@@ -28,7 +28,11 @@
   },
   "type": "module",
   "dependencies": {
+    "@capacitor/cli": "^7.4.5",
+    "@capacitor/core": "^8.0.2",
+    "@capacitor/ios": "^8.0.2",
     "@storyblok/svelte": "^4.0.11",
+    "@sveltejs/adapter-static": "^3.0.10",
     "qrcode": "^1.5.3"
   }
 }

@@ -23,6 +23,8 @@
 </script>
 
 <div class="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900 transition-colors">
+	<!-- Safe area spacer for iOS Dynamic Island/Notch -->
+	<div class="bg-white dark:bg-gray-800 safe-area-top"></div>
 	<nav class="bg-white dark:bg-gray-800 shadow-sm">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 			<div class="flex justify-between h-16">

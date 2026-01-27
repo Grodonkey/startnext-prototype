@@ -24,6 +24,9 @@ class Settings(BaseSettings):
         "http://localhost:5173",
         "https://localhost:5173",
         "https://startnext.grodonkey.com",
+        "capacitor://localhost",
+        "ionic://localhost",
+        "http://localhost",
     ]
 
     # Admin
